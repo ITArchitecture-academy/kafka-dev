@@ -1,0 +1,18 @@
+{
+  "name": "customer-source-connector",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+    "mode": "incrementing",
+    "incrementing.column.name": "id",
+    "topic.prefix": "postgres-import-",
+    "tasks.max": "1",
+    "connection.url": "jdbc:sqlite://[CHANGEME]/lab06_connect/customers.sqlite",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": false,
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": false,
+    "transforms": "setKey",
+    "transforms.setKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
+    "transforms.setKey.fields": "id"
+  }
+}
