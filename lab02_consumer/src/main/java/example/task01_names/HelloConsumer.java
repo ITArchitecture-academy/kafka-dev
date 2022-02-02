@@ -24,7 +24,7 @@ public class HelloConsumer {
         // Initialisiere den Consumer
         // final Consumer<??, ??> consumer = ??
         final Consumer consumer = null;
-        
+
 
         // Auch hier müssen wir den Consumer selbst schließen oder es Javas RAII überlassen ;)
         try (consumer) {
