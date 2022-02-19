@@ -12,8 +12,8 @@ plugins {
     id "idea"
 }
 
-sourceCompatibility = "1.11"
-targetCompatibility = "1.11"
+sourceCompatibility = "1.17"
+targetCompatibility = "1.17"
 version = "0.0.1"
 
 repositories {
@@ -33,7 +33,7 @@ dependencies {
     // Kafka Client-Bibliothek
     implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.0.0'
     // GSON für JSON-Serialisierung
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.9.0'
 }
 
 idea {
