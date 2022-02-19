@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/lab01_producer" />
+    <file type="web" url="file://$PROJECT_DIR$/lab02_consumer" />
+    <file type="web" url="file://$PROJECT_DIR$/lab03_offsets" />
+    <file type="web" url="file://$PROJECT_DIR$/lab05_transactions" />
+    <file type="web" url="file://$PROJECT_DIR$/lab07_hello_streams" />
+    <file type="web" url="file://$PROJECT_DIR$/lab09_stateful_streams" />
+    <file type="web" url="file://$PROJECT_DIR$/lab10_repartitioning" />
+    <file type="web" url="file://$PROJECT_DIR$/lab11_joins" />
+    <file type="web" url="file://$PROJECT_DIR$/lab12_time" />
+    <file type="web" url="file://$PROJECT_DIR$/lab13_interactive_queries" />
+    <file type="web" url="file://$PROJECT_DIR$/lab14_processors" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="17" project-jdk-type="JavaSDK" />
+  <component name="UnattendedHostPersistenceState">
+    <option name="openedFilesInfos">
+      <list>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="518" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/lab01_producer/src/main/java/example/task01_names/HelloNames.java" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="41" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/.gitignore" />
+        </OpenedFileInfo>
+      </list>
+    </option>
+  </component>
+</project>
