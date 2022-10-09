@@ -1,18 +1,20 @@
 {
-  "name": "customer-source-connector",
+  "name": "masterdata-source-connector",
   "config": {
     "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
     "mode": "incrementing",
     "incrementing.column.name": "id",
-    "topic.prefix": "postgres-import-",
+    "topic.prefix": "masterdata-",
     "tasks.max": "1",
-    "connection.url": "jdbc:sqlite://[CHANGEME]/lab06_connect/customers.sqlite",
+    "connection.url": "jdbc:sqlite:///Users/az/Documents/Projects/2019-01 Kafka Wissen/Kafka DEV/labs_solutions/lab06_connect/wind.sqlite",
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "value.converter.schemas.enable": false,
-    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter": "org.apache.kafka.connect.converters.IntegerConverter",
     "key.converter.schemas.enable": false,
-    "transforms": "setKey",
+    "transforms": "setKey,extractKey",
     "transforms.setKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
-    "transforms.setKey.fields": "id"
+    "transforms.setKey.fields": "id",
+    "transforms.extractKey.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.extractKey.field": "id"
   }
 }

@@ -1,29 +1,29 @@
-package example;
+package example.simple;
 
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.Properties;
 
-public class AutoOffsetConsumer {
+public class CreditsAndDebitsConsumer {
     public static void main(final String[] args) {
-        // What do you need to configure here?
         final Properties props = new Properties();
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+                props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        // How do we set how often offsets are committed?
-        // props.put(??, ??);
-
-        // You know the rest
-        final String TOPIC = "wind-turbine-data";
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "credits-and-debits-consumer");
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        // todo Something is missing here - we see too many messages ;)
 
         final Consumer<String, String> consumer = new KafkaConsumer<>(props);
+        final String CREDITS_TOPIC = "bank-credits";
+        final String DEBITS_TOPIC = "bank-debits";
+
 
         try (consumer) {
-            consumer.subscribe(Collections.singletonList(TOPIC));
+            // How do we actually consume from multiple Topics?
+            // todo
 
             System.out.println("Started");
             while (true) {
@@ -31,7 +31,7 @@ public class AutoOffsetConsumer {
                 for (ConsumerRecord<String, String> record : records) {
                     String key = record.key();
                     String value = record.value();
-                    System.out.println(key + ": " + value);
+                    System.out.println(record.topic() + " " + key + ": " + value);
                 }
             }
         }

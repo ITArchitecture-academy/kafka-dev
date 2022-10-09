@@ -14,7 +14,6 @@ import java.util.concurrent.CountDownLatch;
 
 public class HelloStreams {
     public static void main(final String[] args) {
-
         final Properties settings = new Properties();
         //settings.put(??,??)
         // Tipp: Du musst in Streams eine application id vergeben
@@ -59,14 +58,6 @@ public class HelloStreams {
         //   filter((key, value) -> bool): Filtern
         //   mapValues(value -> value.toUpper()): Values verändern
         //   etc
-
-        // todo: was wäre denn hier für unsere Übersetzung am sinnvollsten?
-        final KStream<String, String> spanishGreetings = null;
-
-        // So können wir Daten auf die Kommandozeile ausgeben
-        spanishGreetings.print(Printed.toSysOut());
-        // und so in ein Topic schreiben
-        spanishGreetings.to("greetings_spanish");
 
         // Teil 2
 
