@@ -36,7 +36,7 @@ public class WindTurbineProducer {
 
         // Todo initialize a producer
         // Producer<??, ??> producer = new ??
-        Producer producer = null
+        Producer producer = null;
 
         // Please always close the producers. try(var) {} closes it automatically
         try (producer) {
