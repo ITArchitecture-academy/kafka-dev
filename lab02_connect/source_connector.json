@@ -6,7 +6,7 @@
     "incrementing.column.name": "id",
     "topic.prefix": "masterdata-",
     "tasks.max": "1",
-    "connection.url": "jdbc:sqlite:///home/user/dev-training/lab06_connect/wind.sqlite",
+    "connection.url": "jdbc:sqlite:///home/user/dev-training/lab02_connect/wind.sqlite",
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "value.converter.schemas.enable": false,
     "key.converter": "org.apache.kafka.connect.converters.IntegerConverter",

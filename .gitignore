@@ -1,6 +1,6 @@
 .gradle
 build
-lab06_connect/test.sink.txt
+lab02_connect/test.sink.txt
 .idea
 *.sink.txt
 .idea
