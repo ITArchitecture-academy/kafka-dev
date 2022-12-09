@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "lab07-hello-streams"
+version = "0.1.0"
+description = ""
+packages = [{include = "src"}]
+authors = ["Anatoly Zelenin"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+faust-streaming = {extras = ["rocksdb"], version = "^0.9.5"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

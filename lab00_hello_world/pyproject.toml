@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "lab00-hello-world"
+version = "0.1.0"
+description = ""
+packages = [{include = "src"}]
+authors = ["Anatoly Zelenin"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+confluent-kafka = "^1.9.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
