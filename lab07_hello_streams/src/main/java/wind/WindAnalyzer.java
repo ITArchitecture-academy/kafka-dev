@@ -60,6 +60,9 @@ public class WindAnalyzer {
         // TASK 1: Simple transformations
 
         // The Power in the topic is given in Kilo-Watts. But we would like to display it in Mega-Watts. How to do that?
+        // Hint: You can use the function mapValues
+        // Hint2: Use a lambda expression (argument) -> argument * 123
+        //                            or: (argument) -> { return argument * 123; }
         final KStream<String, WindTurbineData> dataInMW = null; // todo
         // Print it to STDOUT
         dataInMW.print(Printed.toSysOut());
@@ -68,6 +71,7 @@ public class WindAnalyzer {
         // Uncomment the code only if you have finished task 1
 /*
         // Now we care only about the data if the currentPower is less than 10000 Watts.
+        // Hint: Use the function filter
         final KStream<String, WindTurbineData> littleWind = null; // Todo
         // Print it to STDOUT
         littleWind.print(Printed.toSysOut());
@@ -79,7 +83,9 @@ public class WindAnalyzer {
         // Extra TASK 3: Branching
 
         // The solution from Task 2 is working but not really elegant. Using split() and branch() makes your life easier ;)
-        // Tipp: Write the data for much wind to the topic `much-wind` and the one for little wind to `little-wind`
+        // Hint: Write the data for much wind to the topic `much-wind` and the one for little wind to `little-wind`
+        //       Use therefore the function to().
+        //       To configure the SerDe use the function Produced.with(Serdes.String(), new WindTurbineDataSerDe()) as the second argument
         // todo
 
         return builder.build();
