@@ -11,13 +11,21 @@ import java.util.Map;
 
 // shows the current turbine data on `/`
 public class WindTurbineAPI implements Closeable {
-    private final HttpServer server;
+    private HttpServer server;
     private final Map<String, WindTurbineData> measurements;
 
     public WindTurbineAPI(int port, Map<String, WindTurbineData> measurements) throws IOException {
         this.measurements = measurements;
 
-        server = HttpServer.create(new InetSocketAddress(port), 0);
+        // Check if port is available – otherwise take the next one
+        while (true) {
+            try {
+                server = HttpServer.create(new InetSocketAddress(port), 0);
+                break;
+            } catch (IOException e) {
+                port++;
+            }
+        }
         server.createContext("/", httpExchange -> {
             try {
                 byte[] responseBytes = getMetrics().getBytes();
