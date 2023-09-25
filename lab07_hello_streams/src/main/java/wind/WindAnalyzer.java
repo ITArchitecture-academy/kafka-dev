@@ -59,7 +59,7 @@ public class WindAnalyzer {
 
         // TASK 1: Simple transformations
 
-        // The Power in the topic is given in Watts. But we would like to display it in Mega-Watts. How to do that?
+        // The Power in the topic is given in Kilo-Watts. But we would like to display it in Mega-Watts. How to do that?
         final KStream<String, WindTurbineData> dataInMW = null; // todo
         // Print it to STDOUT
         dataInMW.print(Printed.toSysOut());
