@@ -1,5 +1,6 @@
 package wind;
 
+import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
@@ -7,16 +8,13 @@ import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.*;
 import wind.common.JSONSerde;
 import wind.common.KafkaStreamsUtils;
-import wind.internal_data_types.CustomerMasterData;
-import wind.internal_data_types.WindParkMasterData;
-import wind.internal_data_types.WindTurbineDataWithName;
-import wind.internal_data_types.WindTurbineMasterData;
+import wind.datatypes.*;
 
+import java.time.Duration;
 import java.util.Properties;
 
 public class WindTurbineJoiner {
 
-    // This is always the same
     public static void main(final String[] args) {
         final Properties settings = new Properties();
         settings.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -30,51 +28,99 @@ public class WindTurbineJoiner {
     private static Topology getTopology() {
         StreamsBuilder builder = new StreamsBuilder();
 
-        // Task 1: We would like to enrich the data from the `wind-turbine-data` with the names of the wind parks.
-        // We find the names for the wind parks in the topic `masterdata-wind_parks` (Imported in Lab 6 by Kafka Connect)
-        // The output data type is `WindTurbineDataWithName` from the `internal_data_types` package.
+        // One Serde to rule them all
+        Serde<String> keySerde = Serdes.String();
 
-        // As always: Get data from the `wind-turbine-data` topic
+        /** Hints
+         * Try to understand the types
+         * Always use Serdes even if they are optional
+         * Use the visualizer to understand the topology
+         */
+
+
+        /************************************************************************************************
+         * Task 1: KSTream - KTable
+         * wind-turbine-data with wind-park-masterdata
+         ************************************************************************************************/
+
+        // Right: Wind Turbine Data (KStream)
+
+        // Define the Serdes for the data types used in this join. Makes it easier to read the code.
+        Serde<WindTurbineData> turbineDataSerde = new JSONSerde<>(WindTurbineData.class);
+
         final KStream<String, WindTurbineData> windTurbineData = builder
                 .stream("wind-turbine-data",
-                        Consumed.with(Serdes.String(), new JSONSerde<>(WindTurbineData.class)));
+                        Consumed.with(keySerde, turbineDataSerde));
 
-        // Todo: Create a table from the topic `masterdata-wind_parks` we have imported using Kafka Connect
-        // Do not forget about the SerDe. Please check the `internal_data_types` folder for more information
-        final KTable<Integer, WindParkMasterData> windParkMasterData = null;
+        // Left: Wind Turbine Master Data (KTable)
 
-        // Todo: Check whether the Keys in the topics `wind-turbine-data` and `masterdata-wind_parks` are compatible
-        //  and whether you can join them directly. Probably you need to do something before joining them.
+        // Serde for the left side
+        Serde<WindTurbineMasterData> masterDataSerde = new JSONSerde<>(WindTurbineMasterData.class);
 
-        // Todo: Now it is time to join the data.
-        // Example: stream.join(table, (key, left, right) -> new DataType(left, right),
-        //                              Joined.with(KeySerde, LeftSerde, RightSerde)
-        final KStream<Integer, WindTurbineDataWithName> windTurbineDataWithName = null;
+        final KTable<String, WindTurbineMasterData> windTurbineMasterdata = builder
+                .table("wind-turbine-masterdata",
+                        Consumed.with(keySerde, masterDataSerde));
 
-        // Todo: Write the data to the topic `wind-turbine-data-with-wind-park-names`
-        // Do not forget the Serde!
+        // Result Serde
+        Serde<WindTurbineDataWithMasterdata> turbineDataWithMasterdataSerde = new JSONSerde<>(WindTurbineDataWithMasterdata.class);
+
+        // Join: KStream - KTable -> KStream
+        // joiner = (leftValue, rightValue) -> resultValue
+        final ValueJoiner<WindTurbineData, WindTurbineMasterData, WindTurbineDataWithMasterdata> joiner = null;
+        // Join-Serdes: Joined.with(keySerde, leftValueSerde, rightValueSerde)
+
+        // left.join(right, joiner, join-serdes)
+        final KStream<String, WindTurbineDataWithMasterdata> enrichedWindTurbineData = null;
+
+        enrichedWindTurbineData.print(Printed.toSysOut());
+        enrichedWindTurbineData.to("wind-turbine-data-with-wind-park-names",
+                Produced.with(keySerde, turbineDataWithMasterdataSerde));
+
+
+        /************************************************************************************************
+         * Task 2: KTable - KTable
+         * wind-turbine-status with wind-turbine-masterdata
+         ************************************************************************************************/
 
         /*
-        Uncomment it only after finishing the first task
-        // Todo: Extra Task: Check the `masterdata-wind_turbines` topic. You will see, that it is normalized (i.e. There are only IDs and no names)
-        // Create a new topic `wind-turbine-master-data` containing not only the IDs of wind parks and customers, but also their names
-        // Use the class `WindTurbineMasterData` for that.
-        // Hint: You will need more than one Join for that. We have simplified the `WindTurbineMasterData` class to make it as easy as possible
+        Serde<WindTurbineStatus> statusSerde = new JSONSerde<>(WindTurbineStatus.class);
+        final KTable<String, WindTurbineStatus> windTurbineStatus = builder
+                .table("wind-turbine-status",
+                        Consumed.with(keySerde, statusSerde));
 
-        // Todo "Import" the data from the `masterdata-customers` topic
-        final KTable<Integer, CustomerMasterData> customerMasterData = null;
+        Serde<WindTurbineStatusWithMasterdata> enrichedWindTurbineSerde = null;
+        // A Table-Table Join does not need a Joined.with() call.
+        final KTable<String, WindTurbineStatusWithMasterdata> enrichedWindTurbineStatus = null;
 
-        // Todo "Import" the data from the `masterdata-wind_turbines` topic
-        final KTable<Integer, WindTurbineMasterData> windTurbinesRawMasterData = null;
+        enrichedWindTurbineStatus.toStream().to("wind-turbine-status-with-masterdata",
+                Produced.with(keySerde, enrichedWindTurbineSerde));
+        /**/
 
-        // Todo join the windTurbinesRawMasterData with the customers.
-        // Hint: Do not forget the Materialized.with
-        final KTable<Integer, WindTurbineMasterData> windTurbineRawWithCustomerName = null;
-        // Todo join the windTurbineRawWithCustomerName with the windParkMasterData
-        final KTable<Integer, WindTurbineMasterData> windTurbineMasterData = null;
+        /************************************************************************************************
+         * Task 3: KStream - KStream
+         * wind-turbine-data with weather-data
+         */
 
-        // Todo: write the data to the wind-turbine-master-data topic
-        //*/
+        /*
+        Serde<WeatherData> weatherDataSerde = new JSONSerde<>(WeatherData.class);
+        final KStream<String, WeatherData> weatherData = builder
+                .stream("weather-data",
+                        Consumed.with(keySerde, weatherDataSerde));
+
+        Serde<WindTurbineDataWithWeatherData> turbineDataWithWeatherDataSerde = new JSONSerde<>(WindTurbineDataWithWeatherData.class);
+
+        // A Stream-Stream Join is always time-windowed. We need to define the window duration.
+        Duration joinWindowDuration = Duration.ofSeconds(20);
+
+        // left.join(right, joiner, join-window, join-serdes)
+        // join-window = JoinWindows.ofTimeDifferenceWithNoGrace(joinWindowDuration)
+        // join-serdes = StreamJoined.with(keySerde, leftValueSerde, rightValueSerde)
+        final KStream<String, WindTurbineDataWithWeatherData> enrichedWindTurbineDataWithWeatherData = null;
+
+        enrichedWindTurbineDataWithWeatherData.to("wind-turbine-data-with-weather-data",
+                Produced.with(keySerde, turbineDataWithWeatherDataSerde));
+
+        /**/
 
         return builder.build();
     }
