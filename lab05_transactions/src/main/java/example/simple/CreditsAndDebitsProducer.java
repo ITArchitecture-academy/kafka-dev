@@ -52,6 +52,7 @@ public class CreditsAndDebitsProducer {
                 // Let's send the records
                 producer.send(senderRecord);
                 producer.send(receiverRecord);
+                producer.flush();
 
                 // For illustrative purposes only:
 

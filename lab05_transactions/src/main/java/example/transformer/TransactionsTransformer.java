@@ -65,6 +65,7 @@ public class TransactionsTransformer {
                         // We send the messages
                         producer.send(senderRecord);
                         producer.send(receiverRecord);
+                        producer.flush();
 
                         // And now it's about committing the offsets
                         // Our consumer does not know anything about the transaction! Therefore our producer takes care of committing the offsets correctly!
