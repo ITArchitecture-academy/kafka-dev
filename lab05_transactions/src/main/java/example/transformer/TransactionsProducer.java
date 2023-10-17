@@ -25,10 +25,10 @@ public class TransactionsProducer {
             msgsPerSec = Integer.parseInt(args[0]);
         }
 
-        final Stream<BankTransaction> toGreet = Stream.generate(new BankTransactionSupplier(msgsPerSec));
+        final Stream<BankTransaction> transactionStream = Stream.generate(new BankTransactionSupplier(msgsPerSec));
 
         try (Producer<String, BankTransaction> producer = new KafkaProducer<>(props)) {
-            toGreet.forEach(bankTransaction -> {
+            transactionStream.forEach(bankTransaction -> {
                 ProducerRecord<String, BankTransaction> producerRecord = new ProducerRecord<>(TOPIC, bankTransaction);
                 producer.send(producerRecord);
                 System.out.println("Produced record" + bankTransaction);
