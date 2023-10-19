@@ -34,13 +34,13 @@ public class CreditsAndDebitsProducer {
 
         // Here we get a list of transactions (.limits the length of the stream).
         // Some of them are treacherous
-        final List<BankTransaction> toGreet = Stream.generate(new BankTransactionSupplier(10000)).limit(numMessages).collect(Collectors.toList());
+        final List<BankTransaction> transactions = Stream.generate(new BankTransactionSupplier(10000)).limit(numMessages).collect(Collectors.toList());
 
         try (Producer<String, String> producer = new KafkaProducer<>(props)) {
             // Before we can use transactions, we need to initialize them
             // todo
 
-            for (BankTransaction transaction : toGreet) {
+            for (BankTransaction transaction : transactions) {
                 // Let's start the transaction
                 // How?
 
