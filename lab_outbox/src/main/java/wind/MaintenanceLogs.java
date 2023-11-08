@@ -1,10 +1,10 @@
 package wind;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MaintenanceLogs {
 
@@ -18,8 +18,8 @@ public class MaintenanceLogs {
                     "VALUES (?, ?, ?, ?::json, ?);";
 
     private static final String URL = "jdbc:postgresql://localhost:5432/user";
-    private static final String USER = "yourUsername";
-    private static final String PASSWORD = "yourPassword";
+    private static final String USER = "user";
+    private static final String PASSWORD = "password";
 
     public static void main(String[] args) {
         MaintenanceLogs inserter = new MaintenanceLogs();
@@ -37,28 +37,49 @@ public class MaintenanceLogs {
     }
 
     public void insertData() {
-        try (Connection conn = DriverManager.getConnection(URL);
-             PreparedStatement maintenanceStmt = conn.prepareStatement(INSERT_MAINTENANCE_SQL);
-             PreparedStatement outboxStmt = conn.prepareStatement(INSERT_OUTBOX_SQL)) {
+        // Define date format for SQL timestamp
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-            // Example values, these should be dynamically generated or queried
-            int turbineId = 1;
-            String actionsPerformed = "Oil change";
-            double maintenanceCosts = 1500.00;
-            String remarks = "Regular maintenance performed";
+        // Generate random data
+        int turbineId = ThreadLocalRandom.current().nextInt(1, 100); // Assuming you have 100 turbines
+        String[] actions = {"Oil change", "Blade inspection", "Gearbox replacement"};
+        String actionsPerformed = actions[ThreadLocalRandom.current().nextInt(actions.length)];
+        double maintenanceCosts = ThreadLocalRandom.current().nextDouble(1000, 5000);
+        String remarks = "Performed by technician #" + ThreadLocalRandom.current().nextInt(1, 10);
+        LocalDateTime nextMaintenance = LocalDateTime.now().plusMonths(ThreadLocalRandom.current().nextInt(1, 12));
+        String nextMaintenanceDate = nextMaintenance.format(dateTimeFormatter);
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement maintenanceStmt = conn.prepareStatement(INSERT_MAINTENANCE_SQL, PreparedStatement.RETURN_GENERATED_KEYS);
+             PreparedStatement outboxStmt = conn.prepareStatement(INSERT_OUTBOX_SQL)) {
 
             // Insert maintenance log
             maintenanceStmt.setInt(1, turbineId);
             maintenanceStmt.setString(2, actionsPerformed);
             maintenanceStmt.setDouble(3, maintenanceCosts);
             maintenanceStmt.setString(4, remarks);
-            maintenanceStmt.executeUpdate();
+            int affectedRows = maintenanceStmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException("Creating maintenance log failed, no rows affected.");
+            }
+
+            // Retrieve maintenance log id
+            int maintenanceId;
+            try (ResultSet generatedKeys = maintenanceStmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    maintenanceId = generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("Creating maintenance log failed, no ID obtained.");
+                }
+            }
 
             // Insert outbox event
             String aggregatetype = "WindTurbine";
             String aggregateid = String.valueOf(turbineId);
             String type = "MaintenancePerformed";
-            String payload = "{\"turbineId\": \"" + turbineId + "\", \"action\": \"" + actionsPerformed + "\"}";
+            String payload = String.format("{\"turbineId\": %d, \"action\": \"%s\", \"nextMaintenance\": \"%s\"}",
+                    turbineId, actionsPerformed, nextMaintenanceDate);
             UUID payloadid = UUID.randomUUID();
 
             outboxStmt.setString(1, aggregatetype);
