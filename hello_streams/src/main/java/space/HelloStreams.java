@@ -15,10 +15,11 @@ import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
 
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
 
 public class HelloStreams {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         // Configure the Kafka Streams application
         Properties props = new Properties();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "filter-launched-missions");
@@ -51,12 +52,20 @@ public class HelloStreams {
         System.out.println("On this page you can visualize the topology: https://zz85.github.io/kafka-streams-viz/");
         System.out.println(topology.describe());
 
+        // We need a latch here, because the Kafka Streams application is running in a separate thread.
+        CountDownLatch latch = new CountDownLatch(1);
+
+
         // Build and start the Kafka Streams application
         try (KafkaStreams streams = new KafkaStreams(topology, props)) {
-            streams.start();
-
             // Add shutdown hook to gracefully close the streams application
-            Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                latch.countDown();
+                streams.close();
+            }));
+            streams.start();
+            latch.await();
+
         }
     }
 }
