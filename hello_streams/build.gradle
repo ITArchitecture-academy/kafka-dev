@@ -1,0 +1,44 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+    }
+}
+
+plugins {
+    id "java"
+    id "idea"
+}
+
+sourceCompatibility = "16"
+targetCompatibility = "16"
+version = "0.0.1"
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url "https://packages.confluent.io/maven"
+    }
+}
+
+apply plugin: "com.github.johnrengelman.shadow"
+
+dependencies {
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
+    implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.3.0'
+    implementation group: "org.apache.kafka", name: "kafka-streams", version: "3.3.0"
+    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.0'
+    // org.apache.kafka.connect.json.JsonSerializer
+    implementation group: 'org.apache.kafka', name: 'connect-json', version: '3.3.0'
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
