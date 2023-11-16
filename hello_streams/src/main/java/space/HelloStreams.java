@@ -8,8 +8,10 @@ import org.apache.kafka.connect.json.JsonSerializer;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
 
 import java.util.Properties;
@@ -38,14 +40,23 @@ public class HelloStreams {
                 (key, jsonNode) -> jsonNode.get("status").asText().equals("launched")
         );
 
+        // Print the filtered messages to the console
+        filteredStream.print(Printed.toSysOut());
+
         // Write the filtered messages to the launched_missions topic
         filteredStream.to("launched_missions", Produced.with(Serdes.String(), jsonSerde));
 
-        // Build and start the Kafka Streams application
-        KafkaStreams streams = new KafkaStreams(builder.build(), props);
-        streams.start();
+        Topology topology = builder.build();
+        // Visualize the topology
+        System.out.println("On this page you can visualize the topology: https://zz85.github.io/kafka-streams-viz/");
+        System.out.println(topology.describe());
 
-        // Add shutdown hook to gracefully close the streams application
-        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+        // Build and start the Kafka Streams application
+        try (KafkaStreams streams = new KafkaStreams(topology, props)) {
+            streams.start();
+
+            // Add shutdown hook to gracefully close the streams application
+            Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+        }
     }
 }
