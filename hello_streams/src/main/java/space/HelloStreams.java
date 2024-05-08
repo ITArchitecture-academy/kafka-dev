@@ -19,7 +19,7 @@ public class HelloStreams {
     public static void main(String[] args) throws InterruptedException {
         // Configure the Kafka Streams application
         Properties props = new Properties();
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "filter-launched-missions");
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "filter-cash-payments");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
         // Define the JSON SerDe
@@ -30,19 +30,19 @@ public class HelloStreams {
         // Create a StreamsBuilder
         StreamsBuilder builder = new StreamsBuilder();
 
-        // Create a KStream from the space_missions topic
-        KStream<String, JsonNode> sourceStream = builder.stream("space_missions", Consumed.with(Serdes.String(), jsonSerde));
+        // Create a KStream from the supermarket_purchases topic
+        KStream<String, JsonNode> sourceStream = builder.stream("supermarket_purchases", Consumed.with(Serdes.String(), jsonSerde));
 
-        // Filter messages where status is 'launched'
+        // Filter messages where payment_method is 'cash'
         KStream<String, JsonNode> filteredStream = sourceStream.filter(
-                (key, jsonNode) -> jsonNode.get("status").asText().equals("launched")
+                (key, jsonNode) -> jsonNode.get("payment_method").asText().equals("cash")
         );
 
         // Print the filtered messages to the console
         filteredStream.print(Printed.toSysOut());
 
-        // Write the filtered messages to the launched_missions topic
-        filteredStream.to("launched_missions", Produced.with(Serdes.String(), jsonSerde));
+        // Write the filtered messages to the cash_payments topic
+        filteredStream.to("cash_payments", Produced.with(Serdes.String(), jsonSerde));
 
         Topology topology = builder.build();
         // Visualize the topology
