@@ -43,7 +43,7 @@ public class WindTurbineJoiner {
          * wind-turbine-data with wind-park-masterdata
          ************************************************************************************************/
 
-        // Right: Wind Turbine Data (KStream)
+        // Left: Wind Turbine Data (KStream)
 
         // Define the Serdes for the data types used in this join. Makes it easier to read the code.
         Serde<WindTurbineData> turbineDataSerde = new JSONSerde<>(WindTurbineData.class);
@@ -52,9 +52,9 @@ public class WindTurbineJoiner {
                 .stream("wind-turbine-data",
                         Consumed.with(keySerde, turbineDataSerde));
 
-        // Left: Wind Turbine Master Data (KTable)
+        // Right: Wind Turbine Master Data (KTable)
 
-        // Serde for the left side
+        // Serde for the right side
         Serde<WindTurbineMasterData> masterDataSerde = new JSONSerde<>(WindTurbineMasterData.class);
 
         final KTable<String, WindTurbineMasterData> windTurbineMasterdata = builder
