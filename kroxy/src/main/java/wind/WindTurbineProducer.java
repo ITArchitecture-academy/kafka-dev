@@ -13,26 +13,23 @@ import java.util.stream.Stream;
 public class WindTurbineProducer {
     public static void main(final String[] args) {
         final Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class);
-        props.put(KafkaJsonSchemaSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://127.0.0.1:8081");
-        props.put(KafkaJsonSchemaSerializerConfig.AUTO_REGISTER_SCHEMAS, false);
-        props.put(KafkaJsonSchemaSerializerConfig.FAIL_INVALID_SCHEMA, true);
-        props.put(KafkaJsonSchemaSerializerConfig.USE_SCHEMA_ID, 1);
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9292");
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, WindTurbineDataSerializer.class);
 
         final String TOPIC = "wind-turbine-data";
-
+ 
         // The WindTurbineDataSupplier creates a Stream of approximately `msgsPerSec`
-        // messages per seconds for you to produce
-        int msgsPerSec = 1;
+        // messages per seconds for
+
         if (args.length == 1) {
             msgsPerSec = Integer.parseInt(args[0]);
         }
+        // 
         final Stream<WindTurbineData> windTurbineDataStream = Stream
                 .generate(new WindTurbineDataSupplier(50, msgsPerSec));
 
         Producer<String, WindTurbineData> producer = new KafkaProducer<>(props);
-
+        
         try (producer) {
             windTurbineDataStream.forEach(turbineData -> {
                 ProducerRecord<String, WindTurbineData> record = new ProducerRecord<>(TOPIC, turbineData.windTurbineId, turbineData);
@@ -43,3 +40,8 @@ public class WindTurbineProducer {
         }
     }
 }
+
+
+                
+
+                
