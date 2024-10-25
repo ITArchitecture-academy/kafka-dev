@@ -15,6 +15,7 @@ public class WindTurbineConsumer {
         final Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9292");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "wind-turbine-consumer");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, WindTurbineDataDeserializer.class);
         final String TOPIC = "wind-turbine-data";
 
