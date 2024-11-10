@@ -1,52 +1,41 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
-    }
-}
-
 plugins {
-    id "java"
-    id "idea"
+    id 'java'
+    id 'idea'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'application'
 }
 
-sourceCompatibility = "16"
-targetCompatibility = "16"
-version = "0.0.1"
+group = 'wind'
+version = '0.0.1'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
 
 repositories {
     mavenCentral()
-
     maven {
         url "https://packages.confluent.io/maven"
     }
 }
 
-apply plugin: "com.github.johnrengelman.shadow"
-apply plugin: "application"
-
 dependencies {
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
-    implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.9.0'
+    implementation 'org.slf4j:slf4j-simple:1.7.32'
+    implementation 'org.apache.kafka:kafka-clients:3.9.0'
     implementation 'com.google.code.gson:gson:2.8.9'
 }
 
-idea {
-    module {
-        downloadJavadoc = true
-        downloadSources = true
-    }
+application {
+    mainClass = 'wind.WindTurbineProducer'
 }
 
-// Neue Tasks hinzufügen
-task runConsumer(type: JavaExec) {
+tasks.register('runConsumer', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'wind.WindTurbineConsumer'
 }
 
-task runProducer(type: JavaExec) {
+tasks.register('runProducer', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'wind.WindTurbineProducer'
 }

@@ -1,41 +1,35 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
-    }
-}
-
 plugins {
-    id "java"
-    id "idea"
+    id 'java'
+    id 'application'
 }
 
-sourceCompatibility = "16"
-targetCompatibility = "16"
-version = "0.0.1"
+group = 'example.aggregate'
+version = '0.0.1'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
 
 repositories {
     mavenCentral()
-
     maven {
         url "https://packages.confluent.io/maven"
     }
 }
 
-apply plugin: "com.github.johnrengelman.shadow"
-
 dependencies {
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
-    implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.9.0'
-    implementation group: "org.apache.kafka", name: "kafka-streams", version: "3.9.0"
+    implementation 'org.slf4j:slf4j-simple:1.7.32'
+    implementation 'org.apache.kafka:kafka-clients:3.9.0'
+    implementation 'org.apache.kafka:kafka-streams:3.9.0'
     implementation 'com.google.code.gson:gson:2.8.9'
 }
 
-idea {
-    module {
-        downloadJavadoc = true
-        downloadSources = true
-    }
+application {
+    mainClass = 'wind.AverageWindTurbinePower'
+}
+
+tasks.register('runAverageWindParkPower', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'wind.AverageWindParkPower'
 }
